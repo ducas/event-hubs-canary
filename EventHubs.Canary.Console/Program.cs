@@ -20,10 +20,6 @@ namespace EventHubs.Canary.Console
             var cts = new CancellationTokenSource();
 
             System.Console.CancelKeyPress += (s, e) => { e.Cancel = true; cts.Cancel(); };
-
-            ServiceProvider
-                .GetService<ILoggerFactory>()
-                .AddConsole(Configuration.GetSection("Logging"));
             
             ServiceProvider
                 .GetService<Probe>()
@@ -49,7 +45,7 @@ namespace EventHubs.Canary.Console
             return new ServiceCollection()
                 .AddSingleton(Configuration)
                 .AddHttpClient()
-                .AddLogging()
+                .AddLogging(b => b.AddConsole().AddConfiguration(Configuration.GetSection("Logging")))
                 .AddSingleton<Probe>()
                 .AddScoped<IClient, EventHubHttpClient>()
                 .BuildServiceProvider();
